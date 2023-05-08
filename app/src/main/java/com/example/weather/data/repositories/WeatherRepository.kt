@@ -26,12 +26,17 @@ interface WeatherRepository {
     ) : WeatherResponse
 }
 
-
+/**
+ * Network Implementation of [WeatherRepository] that fetches forecast from weatherApi.
+ */
 
 class NetworkWeatherRepository (
     private val weatherApiService: WeatherApiService
 ) : WeatherRepository {
 
+    /**
+     * Fetches current weather for given coordinates: [lat], [lng].
+     */
     override suspend fun getCurrentWeather(
         lat: Float,
         lng: Float
@@ -41,6 +46,10 @@ class NetworkWeatherRepository (
             lng = lng
         )
 
+    /**
+     * Fetches hourly weather forecast for given coordinates: [lat], [lng] and options: [hourly].
+     * To populate [hourly] list use constants defined in [com.example.weather.utils.ApiHourlyWeatherParameters]
+     */
     override suspend fun getHourlyWeather(
         lat: Float,
         lng: Float,
@@ -52,6 +61,10 @@ class NetworkWeatherRepository (
             hourly = hourly
         )
 
+    /**
+     * Fetches daily weather forecast for given coordinates: [lat], [lng] and options: [daily].
+     * To populate [daily] list use constants defined in [com.example.weather.utils.ApiDailyWeatherParameters]
+     */
     override suspend fun getDailyForecast(
         lat: Float,
         lng: Float,

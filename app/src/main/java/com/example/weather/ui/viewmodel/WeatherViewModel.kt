@@ -7,16 +7,23 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.weather.WeatherApplication
 import com.example.weather.data.repositories.WeatherRepository
+import com.example.weather.utils.ApiDailyWeatherParameters
+import com.example.weather.utils.ApiHourlyWeatherParameters
 import kotlinx.coroutines.launch
-
 
 class WeatherViewModel(
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
-    fun getWeather() {
-        viewModelScope.launch {
+    init {
+        getWeather()
+    }
 
+    private fun getWeather() {
+        viewModelScope.launch {
+            getCurrentWeather(52.52F, 13.41F)
+            getHourlyWeather(52.52F, 13.41F)
+            getDailyForecast(52.52F, 13.41F)
         }
     }
 
@@ -24,12 +31,28 @@ class WeatherViewModel(
         weatherRepository.getCurrentWeather(lat, lng)
     }
 
-    private fun getHourlyWeather(lat: Float, lng: Float) {
-
+    private suspend fun getHourlyWeather(lat: Float, lng: Float) {
+        weatherRepository.getHourlyWeather(
+            lat = lat,
+            lng = lng,
+            hourly = listOf(
+                ApiHourlyWeatherParameters.TEMPERATURE,
+                ApiHourlyWeatherParameters.WEATHER_CODE,
+                ApiHourlyWeatherParameters.IS_DAY,
+                ApiHourlyWeatherParameters.PRECIPITATION
+            )
+        )
     }
 
-    private fun getDailyForecast(lat: Float, lng: Float) {
-
+    private suspend fun getDailyForecast(lat: Float, lng: Float) {
+        weatherRepository.getDailyForecast(
+            lat = lat,
+            lng = lng,
+            daily = listOf(
+                ApiDailyWeatherParameters.TEMPERATURE_MAX,
+                ApiDailyWeatherParameters.TEMPERATURE_MIN
+            )
+        )
     }
 
     private suspend fun getCurrentLocation() {
