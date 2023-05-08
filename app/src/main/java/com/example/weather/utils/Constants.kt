@@ -21,6 +21,7 @@ object ApiHourlyWeatherParameters {
     const val APPARENT_TEMPERATURE = "apparent_temperature"
     const val HUMIDITY = "relativehumidity_2m"
     const val PRECIPITATION = "precipitation"
+    const val PRECIPITATION_PROBABILITY = "precipitation_probability"
     const val WEATHER_CODE = "weathercode"
     const val IS_DAY = "is_day"
     const val VISIBILITY = "visibility"
@@ -35,4 +36,9 @@ object ApiHourlyWeatherParameters {
 object ApiDailyWeatherParameters {
     const val TEMPERATURE_MAX = "temperature_2m_max"
     const val TEMPERATURE_MIN = "temperature_2m_min"
+    const val PRECIPITATION = "precipitation_sum"
+    const val PRECIPITATION_HOURS = "precipitation_hours"
+    const val SUNRISE = "sunrise"
+    const val SUNSET = "sunset"
+    const val WEATHER_CODE = "weathercode"
 }

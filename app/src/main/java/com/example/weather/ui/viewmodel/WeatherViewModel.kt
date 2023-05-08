@@ -39,7 +39,8 @@ class WeatherViewModel(
                 ApiHourlyWeatherParameters.TEMPERATURE,
                 ApiHourlyWeatherParameters.WEATHER_CODE,
                 ApiHourlyWeatherParameters.IS_DAY,
-                ApiHourlyWeatherParameters.PRECIPITATION
+                ApiHourlyWeatherParameters.PRECIPITATION,
+                ApiHourlyWeatherParameters.PRECIPITATION_PROBABILITY
             )
         )
     }
@@ -50,7 +51,10 @@ class WeatherViewModel(
             lng = lng,
             daily = listOf(
                 ApiDailyWeatherParameters.TEMPERATURE_MAX,
-                ApiDailyWeatherParameters.TEMPERATURE_MIN
+                ApiDailyWeatherParameters.TEMPERATURE_MIN,
+                ApiDailyWeatherParameters.WEATHER_CODE,
+                ApiDailyWeatherParameters.PRECIPITATION,
+                ApiDailyWeatherParameters.PRECIPITATION_HOURS
             )
         )
     }
