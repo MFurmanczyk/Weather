@@ -2,18 +2,12 @@ package com.example.weather.ui.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.weather.ui.theme.WeatherTheme
+import com.example.weather.ui.viewmodel.WeatherViewModel
 
 @Composable
-fun WeatherScreen(modifier: Modifier = Modifier) {
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun WeatherScreenPreview() {
-    WeatherTheme {
-        WeatherScreen()
-    }
+fun WeatherScreen(
+    viewModel: WeatherViewModel,
+    modifier: Modifier = Modifier
+) {
+    val weatherState = viewModel.weatherState
 }

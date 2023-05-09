@@ -1,6 +1,8 @@
 package com.example.weather.data.repositories
 
-import com.example.weather.data.model.WeatherResponse
+import com.example.weather.data.model.CurrentWeather
+import com.example.weather.data.model.DailyWeather
+import com.example.weather.data.model.HourlyWeather
 import com.example.weather.network.WeatherApiService
 
 /**
@@ -11,19 +13,19 @@ interface WeatherRepository {
     suspend fun getCurrentWeather(
         lat: Float,
         lng: Float
-    ): WeatherResponse
+    ): CurrentWeather
 
     suspend fun getHourlyWeather(
         lat: Float,
         lng: Float,
         hourly: List<String>
-    ) : WeatherResponse
+    ) : HourlyWeather
 
     suspend fun getDailyForecast(
         lat: Float,
         lng: Float,
         daily: List<String>
-    ) : WeatherResponse
+    ) : DailyWeather
 }
 
 /**
@@ -40,26 +42,26 @@ class NetworkWeatherRepository (
     override suspend fun getCurrentWeather(
         lat: Float,
         lng: Float
-    ): WeatherResponse =
+    ): CurrentWeather =
         weatherApiService.getCurrentWeather(
             lat = lat,
             lng = lng
-        )
+        ).body
 
     /**
-     * Fetches hourly weather forecast for given coordinates: [lat], [lng] and options: [hourly].
+     * Fetches hourly weather forecast during present day for given coordinates: [lat], [lng] and options: [hourly].
      * To populate [hourly] list use constants defined in [com.example.weather.utils.ApiHourlyWeatherParameters]
      */
     override suspend fun getHourlyWeather(
         lat: Float,
         lng: Float,
         hourly: List<String>
-    ): WeatherResponse =
+    ): HourlyWeather =
         weatherApiService.getHourlyWeather(
             lat = lat,
             lng = lng,
             hourly = hourly
-        )
+        ).body
 
     /**
      * Fetches daily weather forecast for given coordinates: [lat], [lng] and options: [daily].
@@ -69,11 +71,10 @@ class NetworkWeatherRepository (
         lat: Float,
         lng: Float,
         daily: List<String>
-    ): WeatherResponse =
-        weatherApiService.getDailyForecast(
+    ): DailyWeather =
+        weatherApiService.getDailyWeather(
             lat = lat,
             lng = lng,
             daily = daily
-        )
-
+        ).body
 }
