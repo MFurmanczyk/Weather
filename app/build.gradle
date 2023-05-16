@@ -82,4 +82,7 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
     implementation "com.squareup.okhttp3:okhttp:4.10.0"
+
+    //Coil
+    implementation "io.coil-kt:coil-compose:2.3.0"
 }

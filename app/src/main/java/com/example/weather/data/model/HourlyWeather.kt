@@ -4,7 +4,6 @@ import com.example.weather.utils.ApiGeneralParameters
 import com.example.weather.utils.ApiHourlyWeatherParameters
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class HourlyWeather(

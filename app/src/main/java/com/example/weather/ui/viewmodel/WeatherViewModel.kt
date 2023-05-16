@@ -1,8 +1,5 @@
 package com.example.weather.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,6 +12,10 @@ import com.example.weather.data.model.HourlyWeather
 import com.example.weather.data.repositories.WeatherRepository
 import com.example.weather.utils.ApiDailyWeatherParameters
 import com.example.weather.utils.ApiHourlyWeatherParameters
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -23,7 +24,7 @@ sealed interface WeatherState {
     data class Success(
         val currentWeather: CurrentWeather,
         val hourlyWeather: HourlyWeather,
-        val dailyForecast: DailyWeather
+        val dailyWeather: DailyWeather
         ) : WeatherState
     data class Error(val exception: Exception) : WeatherState
     object Loading : WeatherState
@@ -33,8 +34,8 @@ class WeatherViewModel(
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
-    var weatherState: WeatherState by mutableStateOf(WeatherState.Loading)
-        private set
+    private val _weatherState:MutableStateFlow<WeatherState> = MutableStateFlow(WeatherState.Loading)
+    var weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
 
     init {
         getWeather()
@@ -42,17 +43,21 @@ class WeatherViewModel(
 
     private fun getWeather() {
         viewModelScope.launch {
-            weatherState = WeatherState.Loading
-            weatherState = try {
-                WeatherState.Success(
-                    getCurrentWeather(52.52F, 13.41F),
-                    getHourlyWeather(52.52F, 13.41F),
-                    getDailyForecast(52.52F, 13.41F)
-                )
-            } catch (e: IOException) {
-                WeatherState.Error(e)
-            } catch (e: HttpException) {
-                WeatherState.Error(e)
+            _weatherState.update {
+                WeatherState.Loading
+            }
+            _weatherState.update {
+                try {
+                    WeatherState.Success(
+                        getCurrentWeather(52.52F, 13.41F),
+                        getHourlyWeather(52.52F, 13.41F),
+                        getDailyForecast(52.52F, 13.41F)
+                    )
+                } catch (e: IOException) {
+                    WeatherState.Error(e)
+                } catch (e: HttpException) {
+                    WeatherState.Error(e)
+                }
             }
         }
     }

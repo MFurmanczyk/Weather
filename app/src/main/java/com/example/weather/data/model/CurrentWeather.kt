@@ -6,12 +6,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CurrentWeather (
-    val temperature: Float? = null,
-    @SerialName("windspeed") val windSpeed: Float? = null,
-    @SerialName("winddirection") val windDirection: Float? = null,
-    @SerialName("weathercode") val weatherCode: Int? = null,
-    @SerialName("is_day") val isDay: Int? = null,
-    val time: Long? = null
+    val temperature: Float,
+    @SerialName("windspeed") val windSpeed: Float,
+    @SerialName("winddirection") val windDirection: Float,
+    @SerialName("weathercode") val weatherCode: Int,
+    @SerialName("is_day") val isDay: Int,
+    val time: Long
 ) {
     @Serializable
     data class Response(
