@@ -4,6 +4,7 @@ import android.content.Intent.ShortcutIconResource
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +17,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -50,6 +56,7 @@ import kotlin.math.roundToInt
 /**
  *
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel,
@@ -81,7 +88,13 @@ fun WeatherScreen(
 
     } else {
         /*TODO*/
-        Text(text = "Loading")
+        //Text(text = "Loading")
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
 
@@ -170,10 +183,7 @@ fun LargeWeatherCard(
                     id = R.drawable.baseline_air_24,
                     elementValueString = currentWeatherState.windSpeed.roundToInt().toString() + "km/h"
                 )
-
             }
-
-
         }
     }
 }
@@ -182,7 +192,8 @@ fun LargeWeatherCard(
 fun WeatherElement(
     @DrawableRes id: Int,
     elementValueString: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 24.sp
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -195,7 +206,7 @@ fun WeatherElement(
         Text(
             text = elementValueString,//currentWeatherState.temperature.roundToInt().toString() + "°C",
             style = MaterialTheme.typography.bodyLarge,
-            fontSize = 24.sp
+            fontSize = fontSize
         )
     }
 }
