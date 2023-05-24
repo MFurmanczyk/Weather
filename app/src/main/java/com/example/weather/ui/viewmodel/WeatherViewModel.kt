@@ -49,9 +49,9 @@ class WeatherViewModel(
             _weatherState.update {
                 try {
                     WeatherState.Success(
-                        getCurrentWeather(52.52F, 13.41F),
-                        getHourlyWeather(52.52F, 13.41F),
-                        getDailyForecast(52.52F, 13.41F)
+                        getCurrentWeather(50.30F, 18.68F),
+                        getHourlyWeather(50.30F, 18.68F),
+                        getDailyForecast(50.30F, 18.68F)
                     )
                 } catch (e: IOException) {
                     WeatherState.Error(e)
@@ -89,7 +89,9 @@ class WeatherViewModel(
                 ApiDailyWeatherParameters.TEMPERATURE_MIN,
                 ApiDailyWeatherParameters.WEATHER_CODE,
                 ApiDailyWeatherParameters.PRECIPITATION,
-                ApiDailyWeatherParameters.PRECIPITATION_HOURS
+                ApiDailyWeatherParameters.PRECIPITATION_HOURS,
+                ApiDailyWeatherParameters.SUNRISE,
+                ApiDailyWeatherParameters.SUNSET
             )
         )
     }

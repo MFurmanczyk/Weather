@@ -1,27 +1,25 @@
 package com.example.weather.ui.view
 
-import android.content.Intent.ShortcutIconResource
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +36,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -47,16 +46,19 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.weather.R
 import com.example.weather.data.model.CurrentWeather
-import com.example.weather.ui.theme.WeatherTheme
+import com.example.weather.data.model.DailyWeatherUnit
+import com.example.weather.data.model.HourlyWeatherUnit
+import com.example.weather.data.model.toObjectArray
 import com.example.weather.ui.viewmodel.WeatherState
 import com.example.weather.ui.viewmodel.WeatherViewModel
 import com.example.weather.utils.WeatherImages
+import com.example.weather.utils.getDate
+import com.example.weather.utils.getTime
 import kotlin.math.roundToInt
 
 /**
  *
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel,
@@ -73,9 +75,45 @@ fun WeatherScreen(
                 LargeWeatherCard(
                     currentWeatherState = success.currentWeather
                 )
-                             },
-            hourlyWeather = { },
-            dailyWeather = { },
+            },
+            hourlyWeather = {
+                LazyRow(
+                    contentPadding = PaddingValues(all = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val hourlyWeather = success.hourlyWeather.toObjectArray()
+
+                    items(hourlyWeather) { hourlyUnit ->
+                        WeatherSmallCard(
+                            weatherUnit = hourlyUnit
+                        )
+                    }
+
+                }
+            },
+            dailyWeather = {
+
+                val dailyWeather = success.dailyWeather.toObjectArray()
+
+                for(dailyUnit in dailyWeather) {
+                    WeatherMediumCard(
+                        weatherUnit = dailyUnit,
+                        modifier = Modifier
+                            .padding(
+                                horizontal = 4.dp,
+                                vertical = 2.dp
+                        )
+                    )
+                }
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "Weather data from open-meteo.com",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            },
             modifier = modifier
         )
     }
@@ -88,7 +126,6 @@ fun WeatherScreen(
 
     } else {
         /*TODO*/
-        //Text(text = "Loading")
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -116,11 +153,25 @@ fun WeatherScreenContainer(
             .padding(vertical = 8.dp)
             .fillMaxSize()
             .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
         currentWeather()
+
+        Text(
+            modifier = Modifier.padding(start = 4.dp),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.secondary,
+            text = "Today"
+        )
         hourlyWeather()
+
+        Text(
+            modifier = Modifier.padding(start = 4.dp),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.secondary,
+            text = "Coming days"
+        )
         dailyWeather()
     }
 }
@@ -148,9 +199,24 @@ fun LargeWeatherCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_location_on_24), contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Gliwice, PL",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+
             Text(
-                text = "Berlin, DE",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.Gray,
+                text = "Now",
+                modifier = Modifier.padding(top = 6.dp)
             )
 
             AsyncImage(
@@ -216,14 +282,13 @@ fun WeatherElement(
  */
 @Composable
 fun WeatherMediumCard(
+    weatherUnit: DailyWeatherUnit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier
-            .size(
-                width = 100.dp,
-                height = 150.dp
-            )
+            .fillMaxWidth()
+            .requiredHeight(200.dp)
             .clipToBounds(),
         shape = RoundedCornerShape(
             size = 8.dp
@@ -233,6 +298,116 @@ fun WeatherMediumCard(
             color = Color.LightGray
         )
     ) {
+        Column(
+            modifier = Modifier.padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                text = getDate(weatherUnit.time),
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column(
+                    modifier = Modifier.fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(
+                                WeatherImages.getWeatherImage(
+                                    weatherCode = weatherUnit.weatherCode ?: 0,
+                                    isDay = true
+                                )
+                            )
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Weather image",
+                        modifier = Modifier
+                            .size(120.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.requiredWidth(120.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text(
+                            text = (weatherUnit.temperatureMin ?: 0F).roundToInt().toString() + "°C",
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = (weatherUnit.temperatureMax ?: 0F).roundToInt().toString() + "°C",
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    if((weatherUnit.precipitationHours ?: 0F) > 0F) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(30.dp),
+                                painter = painterResource(
+                                    id = R.drawable.baseline_umbrella_24
+                                ),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Precipitation for\n${weatherUnit.precipitationHours?.roundToInt()} hours",
+                                style = MaterialTheme.typography.bodySmall,
+                                softWrap = true,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = R.drawable.baseline_wb_sunny_24
+                            ),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        WeatherElement(
+                            id = R.drawable.baseline_arrow_drop_up_24,
+                            elementValueString = getTime(weatherUnit.sunrise)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = R.drawable.baseline_wb_sunny_24
+                            ),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        WeatherElement(
+                            id = R.drawable.baseline_arrow_drop_down_24,
+                            elementValueString = getTime(weatherUnit.sunset)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -241,21 +416,55 @@ fun WeatherMediumCard(
  */
 @Composable
 fun WeatherSmallCard(
+    weatherUnit: HourlyWeatherUnit,
     modifier: Modifier = Modifier
 ) {
-    Surface(modifier = modifier) {
-        Card(
-            modifier = Modifier
-                .padding(
-                    bottom = 8.dp,
-                    start = 8.dp,
-                    end = 8.dp
-                )
-                .widthIn(min = 50.dp, max = 50.dp)
-                .heightIn(min = 70.dp, max = 70.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+    Surface(
+        modifier = modifier
+            .size(
+                width = 150.dp,
+                height = 200.dp
+            )
+            .clipToBounds(),
+        shape = RoundedCornerShape(
+            size = 8.dp
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.secondary
+        ),
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            Text(
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                text = getTime(weatherUnit.time),
+                modifier = Modifier.padding(top = 6.dp)
+            )
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                        WeatherImages.getWeatherImage(
+                            weatherCode = weatherUnit.weatherCode ?: 0,
+                            isDay = weatherUnit.isDay == 1
+                        )
+                    )
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Weather image",
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(8.dp)
+            )
+            WeatherElement(
+                id = R.drawable.baseline_thermostat_24,
+                elementValueString = (weatherUnit.temperature ?: 0F).roundToInt().toString() + "°C"
+            )
         }
     }
 }
@@ -281,7 +490,9 @@ fun WeatherLargeCardPreview() {
 @Composable
 fun WeatherMediumCardPreview() {
     MaterialTheme {
-        WeatherMediumCard()
+        WeatherMediumCard(
+            DailyWeatherUnit()
+        )
     }
 }
 
@@ -289,6 +500,6 @@ fun WeatherMediumCardPreview() {
 @Composable
 fun WeatherSmallCardPreview() {
     MaterialTheme {
-        WeatherSmallCard()
+        WeatherSmallCard(HourlyWeatherUnit())
     }
 }
