@@ -31,7 +31,6 @@ interface WeatherRepository {
 /**
  * Network Implementation of [WeatherRepository] that fetches forecast from weatherApi.
  */
-
 class NetworkWeatherRepository (
     private val weatherApiService: WeatherApiService
 ) : WeatherRepository {

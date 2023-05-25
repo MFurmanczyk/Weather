@@ -1,5 +1,6 @@
 package com.example.weather.ui.viewmodel
 
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.example.weather.WeatherApplication
 import com.example.weather.data.model.CurrentWeather
 import com.example.weather.data.model.DailyWeather
 import com.example.weather.data.model.HourlyWeather
+import com.example.weather.data.repositories.LocationRepository
 import com.example.weather.data.repositories.WeatherRepository
 import com.example.weather.utils.ApiDailyWeatherParameters
 import com.example.weather.utils.ApiHourlyWeatherParameters
@@ -22,6 +24,8 @@ import java.io.IOException
 
 sealed interface WeatherState {
     data class Success(
+        /*TODO*/val lat: Float,
+        /*TODO*/val lng: Float,
         val currentWeather: CurrentWeather,
         val hourlyWeather: HourlyWeather,
         val dailyWeather: DailyWeather
@@ -31,17 +35,26 @@ sealed interface WeatherState {
 }
 
 class WeatherViewModel(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     private val _weatherState:MutableStateFlow<WeatherState> = MutableStateFlow(WeatherState.Loading)
     var weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
 
     init {
-        getWeather()
+        refresh()
     }
 
-    private fun getWeather() {
+    fun refresh() {
+        getCurrentLocation { location ->
+            val lat = (location?.latitude?:0.0).toFloat()
+            val lng = (location?.longitude?:0.0).toFloat()
+            getWeather(lat = lat, lng = lng)
+        }
+    }
+
+    private fun getWeather(lat: Float, lng: Float) {
         viewModelScope.launch {
             _weatherState.update {
                 WeatherState.Loading
@@ -49,9 +62,11 @@ class WeatherViewModel(
             _weatherState.update {
                 try {
                     WeatherState.Success(
-                        getCurrentWeather(50.30F, 18.68F),
-                        getHourlyWeather(50.30F, 18.68F),
-                        getDailyForecast(50.30F, 18.68F)
+                        /*TODO*/lat,
+                        /*TODO*/lng,
+                        getCurrentWeather(lat, lng),
+                        getHourlyWeather(lat, lng),
+                        getDailyForecast(lat, lng)
                     )
                 } catch (e: IOException) {
                     WeatherState.Error(e)
@@ -96,8 +111,13 @@ class WeatherViewModel(
         )
     }
 
-    private suspend fun getCurrentLocation() {
-
+    private fun getCurrentLocation(
+        onLocationReceived: (Location?) -> Unit
+    ) {
+        viewModelScope.launch {
+            val location: Location? = locationRepository.getCurrentLocation()
+            onLocationReceived(location)
+        }
     }
 
     /**
@@ -108,7 +128,8 @@ class WeatherViewModel(
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as WeatherApplication)
                 val weatherRepository = application.weatherContainer.weatherRepository
-                WeatherViewModel(weatherRepository)
+                val locationRepository = application.locationContainer.locationRepository
+                WeatherViewModel(weatherRepository, locationRepository)
             }
         }
     }

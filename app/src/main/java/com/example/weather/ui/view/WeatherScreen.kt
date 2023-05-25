@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -73,6 +72,7 @@ fun WeatherScreen(
         WeatherScreenContainer(
             currentWeather = {
                 LargeWeatherCard(
+                    "${success.lat}, ${success.lng}",
                     currentWeatherState = success.currentWeather
                 )
             },
@@ -181,6 +181,7 @@ fun WeatherScreenContainer(
  */
 @Composable
 fun LargeWeatherCard(
+    /*TODO*/location: String,
     currentWeatherState: CurrentWeather,
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
@@ -207,7 +208,7 @@ fun LargeWeatherCard(
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Gliwice, PL",
+                    text = location,
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -474,6 +475,7 @@ fun WeatherSmallCard(
 fun WeatherLargeCardPreview() {
     MaterialTheme {
         LargeWeatherCard(
+            "0.0, 0.0",
             CurrentWeather(
             10.0F,
             10.0F,
