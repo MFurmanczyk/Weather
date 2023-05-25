@@ -2,7 +2,9 @@ package com.example.weather.ui
 
 import android.Manifest
 import android.app.Activity
-import android.util.Log
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -59,15 +62,14 @@ fun WeatherApp(modifier: Modifier = Modifier) {
            )
 
            when {
+               //Permission is granted. App proceeds.
                permissionState.status.isGranted -> {
-                   Log.d("BUG", "Granted.")
-                   val weatherViewModel: WeatherViewModel =
-                       viewModel(factory = WeatherViewModel.Factory)
+                   val weatherViewModel: WeatherViewModel = viewModel(factory = WeatherViewModel.Factory)
                    WeatherScreen(viewModel = weatherViewModel)
                }
 
+               //Permission dialog can be triggered by clicking "Grant" dialog button.
                permissionState.status.shouldShowRationale -> {
-                   Log.d("BUG", "Rationale.")
                    val activity = LocalContext.current as? Activity
                    LocationRationale(
                        title = "Permission required",
@@ -81,6 +83,9 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                    )
                }
 
+               //If permission is permanently denied the only option to grant it is through
+               //the app settings. User can navigate to settings by clicking the according
+               //dialog button.
                permissionState.status.isPermanentlyDenied() -> {
                    val activity = LocalContext.current as? Activity
                    LocationRationale(
@@ -88,7 +93,10 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                        text = "Location access is required to get accurate weather. " +
                                "You can grant it in app settings.",
                        onConfirm = {
-
+                           val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                           val uri = Uri.fromParts("package", activity?.packageName, null)
+                           intent.data = uri
+                           activity?.startActivity(intent)
                        },
                        onDismiss = {
                            activity?.finish()
