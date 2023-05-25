@@ -24,7 +24,7 @@ import com.example.weather.ui.viewmodel.WeatherViewModel
 import com.example.weather.utils.isPermanentlyDenied
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.shouldShowRationale
 
 
@@ -40,8 +40,12 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                .padding(it),
            color = MaterialTheme.colorScheme.background
        ) {
-           val permissionState = rememberPermissionState(
-               permission = Manifest.permission.ACCESS_COARSE_LOCATION
+           val permissionsState = rememberMultiplePermissionsState(
+               permissions = listOf(
+                   Manifest.permission.ACCESS_FINE_LOCATION,
+                   Manifest.permission.ACCESS_COARSE_LOCATION
+
+               )
            )
 
            val lifecycleOwner = LocalLifecycleOwner.current
@@ -49,8 +53,8 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                key1 = lifecycleOwner,
                effect = {
                    val observer = LifecycleEventObserver { _, event ->
-                       if(event == Lifecycle.Event.ON_START) {
-                           permissionState.launchPermissionRequest()
+                       if (event == Lifecycle.Event.ON_START) {
+                           permissionsState.launchMultiplePermissionRequest()
                        }
                    }
                    lifecycleOwner.lifecycle.addObserver(observer)
@@ -61,47 +65,56 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                }
            )
 
-           when {
-               //Permission is granted. App proceeds.
-               permissionState.status.isGranted -> {
-                   val weatherViewModel: WeatherViewModel = viewModel(factory = WeatherViewModel.Factory)
-                   WeatherScreen(viewModel = weatherViewModel)
-               }
+           permissionsState.permissions.forEach { permissionState ->
+               when (permissionState.permission) {
+                   Manifest.permission.ACCESS_FINE_LOCATION -> {
+                       when {
+                           //Permission is granted. App proceeds.
+                           permissionState.status.isGranted -> {
+                               val weatherViewModel: WeatherViewModel =
+                                   viewModel(factory = WeatherViewModel.Factory)
+                               WeatherScreen(viewModel = weatherViewModel)
+                           }
 
-               //Permission dialog can be triggered by clicking "Grant" dialog button.
-               permissionState.status.shouldShowRationale -> {
-                   val activity = LocalContext.current as? Activity
-                   LocationRationale(
-                       title = "Permission required",
-                       text = "Location access is required to get accurate weather.",
-                       onConfirm = {
-                           permissionState.launchPermissionRequest()
-                       },
-                       onDismiss = {
-                           activity?.finish()
-                       }
-                   )
-               }
+                           //Permission dialog can be triggered by clicking "Grant" dialog button.
+                           permissionState.status.shouldShowRationale -> {
+                               val activity = LocalContext.current as? Activity
+                               LocationRationale(
+                                   title = "Permission required",
+                                   text = "Location access is required to get accurate weather.",
+                                   onConfirm = {
+                                       permissionState.launchPermissionRequest()
+                                   },
+                                   onDismiss = {
+                                       activity?.finish()
+                                   }
+                               )
+                           }
 
-               //If permission is permanently denied the only option to grant it is through
-               //the app settings. User can navigate to settings by clicking the according
-               //dialog button.
-               permissionState.status.isPermanentlyDenied() -> {
-                   val activity = LocalContext.current as? Activity
-                   LocationRationale(
-                       title = "Permission required",
-                       text = "Location access is required to get accurate weather. " +
-                               "You can grant it in app settings.",
-                       onConfirm = {
-                           val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                           val uri = Uri.fromParts("package", activity?.packageName, null)
-                           intent.data = uri
-                           activity?.startActivity(intent)
-                       },
-                       onDismiss = {
-                           activity?.finish()
+                           //If permission is permanently denied the only option to grant it is through
+                           //the app settings. User can navigate to settings by clicking the according
+                           //dialog button.
+                           permissionState.status.isPermanentlyDenied() -> {
+                               val activity = LocalContext.current as? Activity
+                               LocationRationale(
+                                   title = "Permission required",
+                                   text = "Location access is required to get accurate weather. " +
+                                           "You can grant it in app settings.",
+                                   onConfirm = {
+                                       val intent =
+                                           Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                       val uri =
+                                           Uri.fromParts("package", activity?.packageName, null)
+                                       intent.data = uri
+                                       activity?.startActivity(intent)
+                                   },
+                                   onDismiss = {
+                                       activity?.finish()
+                                   }
+                               )
+                           }
                        }
-                   )
+                   }
                }
            }
        }

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,30 +23,36 @@ class FusedLocationService(private val context: Context) : LocationService {
     private val fusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
+/*    init {
+        val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasAccessFineLocationPermission) {
+            val requestBuilder = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500L)
+            fusedLocationProviderClient.requestLocationUpdates(
+                requestBuilder.build(),
+                { },
+                null
+            )
+        }
+    }*/
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getCurrentLocation(): Location? {
 
-        val hasAccessCoarseLocationPermission = ContextCompat.checkSelfPermission(
+        val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION
+            android.Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
 
-        val locationManager = context.getSystemService(
-            Context.LOCATION_SERVICE
-        ) as LocationManager
-
-        val isGpsEnabled = locationManager
-            .isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-
-        if (!isGpsEnabled && !(hasAccessCoarseLocationPermission)) {
+        if(!hasAccessFineLocationPermission) {
             return null
         }
 
-        val currentLocation = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
-
         return suspendCancellableCoroutine { cont ->
+            val currentLocation = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             currentLocation.apply {
                 if (isComplete) {
                     if (isSuccessful) {
