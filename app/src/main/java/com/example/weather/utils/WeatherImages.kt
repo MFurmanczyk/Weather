@@ -27,7 +27,7 @@ object WeatherImages {
     )
 
     /**
-     * Set of ([weatherCode], [imageIndex]) pairs.
+     * Set of (weatherCode, imageIndex) pairs.
      */
     private val imageMap = mapOf(
         0 to 0, //Clear sky
@@ -72,7 +72,3 @@ object WeatherImages {
         }
     }
 }
-
-
-
-

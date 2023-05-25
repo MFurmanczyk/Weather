@@ -1,5 +1,9 @@
 package com.example.weather.utils
 
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.shouldShowRationale
 import java.util.Locale
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -23,3 +27,7 @@ fun getDate(timestamp: Long?): String {
         e.toString()
     }
 }
+
+@ExperimentalPermissionsApi
+fun PermissionStatus.isPermanentlyDenied(): Boolean = !shouldShowRationale && !isGranted
+
