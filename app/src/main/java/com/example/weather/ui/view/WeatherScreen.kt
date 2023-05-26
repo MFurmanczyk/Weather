@@ -72,7 +72,7 @@ fun WeatherScreen(
         WeatherScreenContainer(
             currentWeather = {
                 LargeWeatherCard(
-                    "${success.lat}, ${success.lng}",
+                    address = "${success.address.locality}, ${success.address.countryCode}",
                     currentWeatherState = success.currentWeather
                 )
             },
@@ -121,7 +121,7 @@ fun WeatherScreen(
         /*TODO*/
         Column {
             Text(text = "Something went wrong.")
-            Text(text = (weatherState as WeatherState.Error).exception.message.toString())
+            Text(text = (weatherState as WeatherState.Error).getMessage())
         }
 
     } else {
@@ -181,7 +181,7 @@ fun WeatherScreenContainer(
  */
 @Composable
 fun LargeWeatherCard(
-    /*TODO*/location: String,
+    /*TODO*/address: String,
     currentWeatherState: CurrentWeather,
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
@@ -208,7 +208,7 @@ fun LargeWeatherCard(
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = location,
+                    text = address,
                     style = MaterialTheme.typography.titleLarge
                 )
             }

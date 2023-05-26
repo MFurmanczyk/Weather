@@ -3,9 +3,7 @@ package com.example.weather.location
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,22 +20,6 @@ class FusedLocationService(private val context: Context) : LocationService {
 
     private val fusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
-
-/*    init {
-        val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        if (hasAccessFineLocationPermission) {
-            val requestBuilder = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500L)
-            fusedLocationProviderClient.requestLocationUpdates(
-                requestBuilder.build(),
-                { },
-                null
-            )
-        }
-    }*/
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getCurrentLocation(): Location? {

@@ -11,7 +11,7 @@ interface LocationContainer {
 
 class FusedLocationContainer(context: Context): LocationContainer {
 
-    val locationService = FusedLocationService(context = context)
+    private val locationService = FusedLocationService(context)
 
     override val locationRepository: LocationRepository = FusedLocationRepository(locationService)
 }
