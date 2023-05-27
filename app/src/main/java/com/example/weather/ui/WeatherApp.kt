@@ -27,7 +27,6 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.shouldShowRationale
 
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun WeatherApp(modifier: Modifier = Modifier) {
@@ -40,6 +39,7 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                .padding(it),
            color = MaterialTheme.colorScheme.background
        ) {
+
            val permissionsState = rememberMultiplePermissionsState(
                permissions = listOf(
                    Manifest.permission.ACCESS_FINE_LOCATION,
@@ -81,7 +81,7 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                                val activity = LocalContext.current as? Activity
                                LocationRationale(
                                    title = "Permission required",
-                                   text = "Location access is required to get accurate weather.",
+                                   text = "Precise location access is required to get accurate weather.",
                                    onConfirm = {
                                        permissionState.launchPermissionRequest()
                                    },
@@ -98,7 +98,7 @@ fun WeatherApp(modifier: Modifier = Modifier) {
                                val activity = LocalContext.current as? Activity
                                LocationRationale(
                                    title = "Permission required",
-                                   text = "Location access is required to get accurate weather. " +
+                                   text = "Precise location access is required to get accurate weather. " +
                                            "You can grant it in app settings.",
                                    onConfirm = {
                                        val intent =
