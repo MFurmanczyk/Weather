@@ -29,6 +29,12 @@ val Typography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+    titleMedium = Typography().titleMedium.copy(
+        fontFamily = varelaRoundFamily
+    ),
+    titleSmall = Typography().titleSmall.copy(
+        fontFamily = varelaRoundFamily
+    ),
     labelSmall = TextStyle(
         fontFamily = varelaRoundFamily,
         fontWeight = FontWeight.Medium,

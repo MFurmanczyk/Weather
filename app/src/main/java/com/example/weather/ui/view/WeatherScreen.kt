@@ -1,6 +1,5 @@
 package com.example.weather.ui.view
 
-import android.location.Address
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -8,12 +7,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,12 +44,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.weather.R
-import com.example.weather.data.model.CurrentWeather
+import com.example.weather.data.model.toObjectArray
+import com.example.weather.ui.theme.WeatherTheme
 import com.example.weather.ui.viewmodel.WeatherState
 import com.example.weather.ui.viewmodel.WeatherViewModel
 import com.example.weather.utils.WeatherImages
 import com.example.weather.utils.getTime
-import java.util.Locale
 import kotlin.math.roundToInt
 
 /**
@@ -88,11 +91,37 @@ fun WeatherScreen(
 
                     WeatherScreenContainer(
                         currentWeather = {
-                            CurrentWeather(
-                                address = success.address,
-                                currentWeather = success.currentWeather
+                            CurrentWeatherPanel(
+                                address = "${success.address.locality}, ${success.address.countryCode}",
+                                weatherCode = success.currentWeather.weatherCode,
+                                isDay = success.currentWeather.isDay == 1,
+                                time = getTime(success.currentWeather.time),
+                                temperature = success.currentWeather.temperature.roundToInt()
                             )
-                        }
+                        },
+                        hourlyWeather = {
+                            val hourlyList = success.hourlyWeather.toObjectArray()
+
+                            WeatherSection(title = stringResource(R.string.today)) {
+                                LazyRow(
+                                    contentPadding = PaddingValues(horizontal = 4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
+                                ) {
+                                    items(hourlyList) {hourlyUnit ->
+                                        SmallWeatherCard(
+                                            time =
+                                            if (success.currentWeather.time == hourlyUnit.time) stringResource(
+                                                id = R.string.now
+                                            )
+                                            else getTime(hourlyUnit.time),
+                                            weatherCode = hourlyUnit.weatherCode ?: 0,
+                                            isDay = hourlyUnit.isDay == 1,
+                                            temperature = hourlyUnit.temperature?.roundToInt() ?: 0
+                                        )
+                                    }
+                                }
+                            }
+                        },
                     )
                 }
             }
@@ -112,8 +141,11 @@ fun WeatherScreen(
 
 @Composable
 fun WeatherScreenContainer(
-    currentWeather: @Composable ()-> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    currentWeather: @Composable () -> Unit = {},
+    currentHighlights: @Composable () -> Unit = {},
+    hourlyWeather: @Composable () -> Unit = {},
+    dailyWeather: @Composable () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
@@ -128,14 +160,20 @@ fun WeatherScreenContainer(
                 .verticalScroll(scrollState)
         ) {
             currentWeather()
+            currentHighlights()
+            hourlyWeather()
+            dailyWeather()
         }
     }
 }
 
 @Composable
-fun CurrentWeather(
-    address: Address,
-    currentWeather: CurrentWeather,
+fun CurrentWeatherPanel(
+    address: String,
+    weatherCode: Int,
+    isDay: Boolean,
+    time: String,
+    temperature: Int,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -160,7 +198,7 @@ fun CurrentWeather(
                     tint = MaterialTheme.colorScheme.secondary
                 )
                 Text(
-                    text = "${address.locality}, ${address.countryCode}"
+                    text = address
                 )
             }
 
@@ -173,8 +211,8 @@ fun CurrentWeather(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(
                         WeatherImages.getWeatherImage(
-                            weatherCode = currentWeather.weatherCode,
-                            isDay = currentWeather.isDay == 1
+                            weatherCode = weatherCode,
+                            isDay = isDay
                         )
                     )
                     .crossfade(true)
@@ -186,7 +224,7 @@ fun CurrentWeather(
             )
 
             Text(
-                text = getTime(currentWeather.time),
+                text = time,
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -195,7 +233,7 @@ fun CurrentWeather(
                 verticalAlignment = Alignment.Top
             ) {
                 Text(
-                    text = currentWeather.temperature.roundToInt().toString(),
+                    text = temperature.toString(),
                     fontSize = 64.sp
                 )
                 Text(
@@ -207,20 +245,117 @@ fun CurrentWeather(
         }
     }
 }
+@Composable
+fun WeatherSection(
+    title: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+        content()
+    }
+}
+
+@Composable
+fun SmallWeatherCard(
+    time: String,
+    weatherCode: Int,
+    isDay: Boolean,
+    temperature: Int,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .sizeIn(minWidth = 70.dp, minHeight = 100.dp),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.padding(all = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            Text(
+                text = time,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                        WeatherImages.getWeatherImage(
+                            weatherCode = weatherCode,
+                            isDay = isDay
+                        )
+                    )
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Weather image",
+                modifier = Modifier
+                    .size(50.dp)
+                    .padding(all = 4.dp)
+            )
+            Row(
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = temperature.toString(),
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = stringResource(R.string.degrees_c),
+                    fontSize = 8.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
 
 @Composable
 @Preview
 fun CurrentWeatherPreview() {
-    MaterialTheme {
-        CurrentWeather(
-            address = Address(Locale.getDefault()),
-            currentWeather = CurrentWeather(
-            0F,
-            0F,
-            0F,
-            0,
-            0,
-            0L
-        ))
+    WeatherTheme {
+        CurrentWeatherPanel(
+            address = "Gliwice, PL",
+            weatherCode = 1,
+            isDay = true,
+            time = "9:37 PM",
+            temperature = 10
+        )
+    }
+}
+
+@Composable
+@Preview
+fun WeatherSectionPreview() {
+    WeatherTheme {
+        WeatherSection(
+            title = "Title"
+        ) {
+
+        }
+    }
+}
+
+@Composable
+@Preview
+fun SmallWeatherCardPreview() {
+    WeatherTheme{
+        SmallWeatherCard(
+            time = "Now",
+            weatherCode = 1,
+            isDay = true,
+            temperature = 10
+        )
     }
 }
