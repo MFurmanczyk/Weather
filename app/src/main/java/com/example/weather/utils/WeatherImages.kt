@@ -26,6 +26,16 @@ object WeatherImages {
         "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/50n.png"
     )
 
+    private val parameterImages = mapOf(
+        WeatherParams.CLOUDS to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/clouds.png",
+        WeatherParams.HUMIDITY to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/humidity.png",
+        WeatherParams.PRESSURE to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/pressure.png",
+        WeatherParams.SUNRISE to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/sunrise.png",
+        WeatherParams.SUNSET to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/sunset.png",
+        WeatherParams.UV to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/uv.png",
+        WeatherParams.WIND to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/wind-day.png",
+    )
+
     /**
      * Set of (weatherCode, imageIndex) pairs.
      */
@@ -70,5 +80,18 @@ object WeatherImages {
         } catch(e: NoSuchElementException) {
             imagesArray[0]
         }
+    }
+
+    fun getParamImage(param: WeatherParams): String {
+        return parameterImages[param].toString()
+    }
+    enum class WeatherParams {
+        CLOUDS,
+        HUMIDITY,
+        PRESSURE,
+        SUNRISE,
+        SUNSET,
+        UV,
+        WIND
     }
 }

@@ -3,4 +3,8 @@
     <string name="now">Now</string>
     <string name="degrees_c">°C</string>
     <string name="today">Today</string>
+    <string name="coming_days">Coming days</string>
+    <string name="data_source">Weather data from open-meteo.com</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
 </resources>

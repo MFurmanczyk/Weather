@@ -18,7 +18,7 @@ fun getTime(timestamp: Long?): String {
     }
 }
 
-fun getDate(timestamp: Long?): String {
+fun getDayOfWeek(timestamp: Long?): String {
     return try {
         val sdf = SimpleDateFormat("EEEE", Locale.getDefault())
         val netDate = Date(timestamp?.times(1000) ?: 0)
