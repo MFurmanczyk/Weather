@@ -109,7 +109,10 @@ class WeatherViewModel(
                 ApiHourlyWeatherParameters.WEATHER_CODE,
                 ApiHourlyWeatherParameters.IS_DAY,
                 ApiHourlyWeatherParameters.PRECIPITATION,
-                ApiHourlyWeatherParameters.PRECIPITATION_PROBABILITY
+                ApiHourlyWeatherParameters.PRECIPITATION_PROBABILITY,
+                ApiHourlyWeatherParameters.HUMIDITY,
+                ApiHourlyWeatherParameters.APPARENT_TEMPERATURE,
+                ApiHourlyWeatherParameters.PRESSURE_SURFACE
             )
         )
     }

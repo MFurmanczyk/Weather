@@ -1,10 +1,5 @@
 package com.example.weather.data.model
 
-import com.example.weather.utils.ApiDailyWeatherParameters
-import com.example.weather.utils.ApiGeneralParameters
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
 data class HourlyWeatherUnit (
     val time: Long? = null,
     val temperature: Float? = null,

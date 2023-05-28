@@ -7,7 +7,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -27,7 +27,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.shouldShowRationale
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun WeatherApp(modifier: Modifier = Modifier) {
     Scaffold(
@@ -36,8 +36,7 @@ fun WeatherApp(modifier: Modifier = Modifier) {
        Surface(
            modifier = Modifier
                .fillMaxSize()
-               .padding(it),
-           color = MaterialTheme.colorScheme.background
+               .padding(it)
        ) {
 
            val permissionsState = rememberMultiplePermissionsState(
