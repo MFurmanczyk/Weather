@@ -58,21 +58,32 @@ class WeatherViewModel(
     private val _weatherState:MutableStateFlow<WeatherState> = MutableStateFlow(WeatherState.Loading)
     var weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
 
+    private val _selectedTimestamp: MutableStateFlow<Long> = MutableStateFlow(0)
+    var selectedTimestamp = _selectedTimestamp.asStateFlow()
+
     init {
         refresh()
     }
 
     fun refresh() {
+        _weatherState.update {
+            WeatherState.Loading
+        }
         getCurrentLocation { location ->
             getWeather(location)
+        }
+
+    }
+
+    fun updateTimestamp(timestamp: Long) {
+        _selectedTimestamp.update {
+            timestamp
         }
     }
 
     private fun getWeather(location: Location?) {
         viewModelScope.launch {
-            _weatherState.update {
-                WeatherState.Loading
-            }
+
             if(location != null) {
                 _weatherState.update {
                     try {
@@ -90,8 +101,13 @@ class WeatherViewModel(
                         WeatherState.ExceptionError(e)
                     }
                 }
+                _selectedTimestamp.update {
+                    (weatherState.value as? WeatherState.Success)?.currentWeather?.time ?: 0L
+                }
             } else {
-                WeatherState.MessageError(msg = "Unable to define device location.")
+                _weatherState.update {
+                    WeatherState.MessageError(msg = "Unable to define device location.")
+                }
             }
         }
     }
@@ -137,8 +153,13 @@ class WeatherViewModel(
         onLocationReceived: (Location?) -> Unit
     ) {
         viewModelScope.launch {
-            val location: Location? = locationRepository.getCurrentLocation()
-            onLocationReceived(location)
+            val currentLocation: Location? = locationRepository.getCurrentLocation()
+            if (currentLocation != null) {
+                onLocationReceived(currentLocation)
+            } else {
+                val lastLocation: Location? = locationRepository.getLastLocation()
+                onLocationReceived(lastLocation)
+            }
         }
     }
 

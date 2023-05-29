@@ -7,4 +7,8 @@
     <string name="data_source">Weather data from open-meteo.com</string>
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
+    <string name="highlights">Today\'s highlights</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
+    <string name="retry">Retry</string>
 </resources>

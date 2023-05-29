@@ -24,8 +24,6 @@ object ApiHourlyWeatherParameters {
     const val PRECIPITATION_PROBABILITY = "precipitation_probability"
     const val WEATHER_CODE = "weathercode"
     const val IS_DAY = "is_day"
-    const val VISIBILITY = "visibility"
-    const val PRESSURE_MSL = "pressure_msl"
     const val PRESSURE_SURFACE = "surface_pressure"
 }
 

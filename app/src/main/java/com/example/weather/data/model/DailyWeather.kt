@@ -7,14 +7,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DailyWeather(
-    val time: List<Long>?,
-    @SerialName(value = ApiDailyWeatherParameters.TEMPERATURE_MAX) val temperatureMax: List<Float>? = null,
-    @SerialName(value = ApiDailyWeatherParameters.TEMPERATURE_MIN) val temperatureMin: List<Float>? = null,
-    @SerialName(value = ApiDailyWeatherParameters.PRECIPITATION) val precipitation: List<Float>? = null,
-    @SerialName(value = ApiDailyWeatherParameters.PRECIPITATION_HOURS) val precipitationHours: List<Float>? = null,
-    @SerialName(value = ApiDailyWeatherParameters.SUNRISE) val sunrise: List<Long>? = null,
-    @SerialName(value = ApiDailyWeatherParameters.SUNSET) val sunset: List<Long>? = null,
-    @SerialName(value = ApiDailyWeatherParameters.WEATHER_CODE) val weatherCode: List<Int>? = null
+    val time: List<Long>,
+    @SerialName(value = ApiDailyWeatherParameters.TEMPERATURE_MAX) val temperatureMax: List<Float>,
+    @SerialName(value = ApiDailyWeatherParameters.TEMPERATURE_MIN) val temperatureMin: List<Float>,
+    @SerialName(value = ApiDailyWeatherParameters.PRECIPITATION) val precipitation: List<Float>,
+    @SerialName(value = ApiDailyWeatherParameters.PRECIPITATION_HOURS) val precipitationHours: List<Float>,
+    @SerialName(value = ApiDailyWeatherParameters.SUNRISE) val sunrise: List<Long>,
+    @SerialName(value = ApiDailyWeatherParameters.SUNSET) val sunset: List<Long>,
+    @SerialName(value = ApiDailyWeatherParameters.WEATHER_CODE) val weatherCode: List<Int>
 ) {
     @Serializable
     data class Response(

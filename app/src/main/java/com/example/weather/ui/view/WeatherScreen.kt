@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,9 +25,12 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.LocationOn
+import androidx.compose.material.icons.twotone.Warning
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +38,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +49,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.weather.R
+import com.example.weather.data.model.DailyWeather
+import com.example.weather.data.model.HourlyWeatherUnit
 import com.example.weather.data.model.toObjectArray
 import com.example.weather.ui.theme.WeatherTheme
 import com.example.weather.ui.viewmodel.WeatherState
@@ -52,7 +58,9 @@ import com.example.weather.ui.viewmodel.WeatherViewModel
 import com.example.weather.utils.WeatherImages
 import com.example.weather.utils.getDayOfWeek
 import com.example.weather.utils.getTime
+import java.util.Locale
 import kotlin.math.roundToInt
+import androidx.compose.ui.Alignment as Alignment1
 
 /**
  *
@@ -116,9 +124,12 @@ fun WeatherScreen(
                                                 id = R.string.now
                                             )
                                             else getTime(hourlyUnit.time),
-                                            weatherCode = hourlyUnit.weatherCode ?: 0,
+                                            weatherCode = hourlyUnit.weatherCode,
                                             isDay = hourlyUnit.isDay == 1,
-                                            temperature = hourlyUnit.temperature?.roundToInt() ?: 0
+                                            temperature = hourlyUnit.temperature.roundToInt(),
+                                            onClick = {
+                                                viewModel.updateTimestamp(hourlyUnit.time)
+                                            }
                                         )
                                     }
                                 }
@@ -134,11 +145,79 @@ fun WeatherScreen(
                                     for(dailyWeather in dailyList) {
                                         MediumWeatherCard(
                                             time = getDayOfWeek(dailyWeather.time),
-                                            weatherCode = dailyWeather.weatherCode ?: 0,
-                                            temperatureMax = dailyWeather.temperatureMax?.roundToInt() ?: 0,
-                                            temperatureMin = dailyWeather.temperatureMin?.roundToInt() ?: 0,
+                                            weatherCode = dailyWeather.weatherCode,
+                                            temperatureMax = dailyWeather.temperatureMax.roundToInt(),
+                                            temperatureMin = dailyWeather.temperatureMin.roundToInt(),
                                             sunriseTime = getTime(dailyWeather.sunrise),
                                             sunsetTime = getTime(dailyWeather.sunset)
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        currentHighlights = {
+                            val hourlyList = success.hourlyWeather.toObjectArray()
+                            var currentUnit: HourlyWeatherUnit? = null
+
+                            /**
+                             * Index of elements in [DailyWeather] arrays for current day.
+                             */
+                            val TODAY_DAILY_INDEX = 0
+
+                            val selectedTimestamp by viewModel.selectedTimestamp.collectAsState()
+
+                            for(hourlyUnit in hourlyList){
+                                if(hourlyUnit.time == selectedTimestamp) {
+                                    currentUnit = hourlyUnit
+                                }
+                            }
+
+                            WeatherSection(title = stringResource(R.string.highlights)) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    horizontalAlignment = Alignment1.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment1.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(id = R.string.sunrise),
+                                            paramImageSrc = WeatherImages.getParamImage(WeatherImages.WeatherParams.SUNRISE),
+                                            highlightValue = getTime(success.dailyWeather.sunrise[TODAY_DAILY_INDEX]),
+                                            highlightUnit = "",
+                                            contentDescription = null
+                                        )
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(id = R.string.sunset),
+                                            paramImageSrc = WeatherImages.getParamImage(WeatherImages.WeatherParams.SUNSET),
+                                            highlightValue = getTime(success.dailyWeather.sunset[TODAY_DAILY_INDEX]),
+                                            highlightUnit = "",
+                                            contentDescription = null
+                                        )
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment1.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(R.string.pressure),
+                                            paramImageSrc = WeatherImages.getParamImage(WeatherImages.WeatherParams.PRESSURE),
+                                            highlightValue = currentUnit?.pressureSurface?.roundToInt().toString(),
+                                            highlightUnit = "hPa",
+                                            contentDescription = null
+                                        )
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(R.string.humidity),
+                                            paramImageSrc = WeatherImages.getParamImage(WeatherImages.WeatherParams.HUMIDITY),
+                                            highlightValue = currentUnit?.humidity?.roundToInt().toString(),
+                                            highlightUnit = "%",
+                                            contentDescription = null
                                         )
                                     }
                                 }
@@ -147,15 +226,26 @@ fun WeatherScreen(
                     )
                 }
             }
-            AnimatedVisibility(visible = weatherState is WeatherState.Error) {
-                TODO("Error screen")
+            AnimatedVisibility(
+                visible = weatherState is WeatherState.Error,
+                enter = fadeIn(animationSpec = tween(durationMillis = 250)),
+                exit = fadeOut(animationSpec = tween(durationMillis = 250))
+            ) {
+                val error = if(weatherState is WeatherState.Error) weatherState as WeatherState.Error else null
+                ErrorScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    errorMessage = error?.getMessage().toString(),
+                    onRetryClick = {
+                        viewModel.refresh()
+                    }
+                )
             }
 
 
             PullRefreshIndicator(
                 refreshing = weatherState is WeatherState.Loading,
                 state = refreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment1.TopCenter)
             )
         }
     }
@@ -182,8 +272,8 @@ fun WeatherScreenContainer(
                 .verticalScroll(scrollState)
         ) {
             currentWeather()
-            currentHighlights()
             hourlyWeather()
+            currentHighlights()
             dailyWeather()
             Text(
                 modifier = Modifier
@@ -216,12 +306,12 @@ fun CurrentWeatherPanel(
     ) {
         Column(
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment1.CenterHorizontally
         ) {
             Row(modifier = Modifier
-                .align(Alignment.Start)
+                .align(Alignment1.Start)
                 .padding(horizontal = 8.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment1.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.TwoTone.LocationOn,
@@ -261,7 +351,7 @@ fun CurrentWeatherPanel(
             )
 
             Row(
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment1.Top
             ) {
                 Text(
                     text = temperature.toString(),
@@ -283,7 +373,7 @@ fun WeatherSection(
     content: @Composable () -> Unit,
 ) {
     Column(
-        horizontalAlignment = Alignment.Start,
+        horizontalAlignment = Alignment1.Start,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
@@ -302,17 +392,20 @@ fun SmallWeatherCard(
     weatherCode: Int,
     isDay: Boolean,
     temperature: Int,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier
-            .size(width = 100.dp, height = 100.dp),
+            .size(width = 100.dp, height = 100.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick) ,
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier.padding(all = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment1.CenterHorizontally
 
         ) {
             Text(
@@ -336,7 +429,7 @@ fun SmallWeatherCard(
                     .padding(all = 4.dp)
             )
             Row(
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment1.Top
             ) {
                 Text(
                     text = temperature.toString(),
@@ -369,7 +462,7 @@ fun MediumWeatherCard(
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment1.CenterHorizontally,
             modifier = Modifier.padding(all = 4.dp)
         ) {
             Text(
@@ -379,11 +472,11 @@ fun MediumWeatherCard(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment1.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment1.CenterHorizontally
                 ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
@@ -405,7 +498,7 @@ fun MediumWeatherCard(
                         modifier = Modifier.widthIn(min = 90.dp)
                     ) {
                         Row(
-                            verticalAlignment = Alignment.Top
+                            verticalAlignment = Alignment1.Top
                         ) {
                             Text(
                                 text = temperatureMax.toString(),
@@ -417,7 +510,7 @@ fun MediumWeatherCard(
                             )
                         }
                         Row(
-                            verticalAlignment = Alignment.Top
+                            verticalAlignment = Alignment1.Top
                         ) {
                             Text(
                                 text = temperatureMin.toString(),
@@ -434,7 +527,7 @@ fun MediumWeatherCard(
                 }
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment1.Start
                 ) {
 
                     WeatherParam(
@@ -455,6 +548,58 @@ fun MediumWeatherCard(
 }
 
 @Composable
+fun HighlightCard(
+    highlightTitle: String,
+    paramImageSrc: String,
+    highlightValue: String,
+    highlightUnit: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment1.CenterHorizontally,
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Text(
+                text = highlightTitle,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(
+                            paramImageSrc
+                        )
+                        .crossfade(true)
+                        .build(),
+            contentDescription = contentDescription,
+            modifier = Modifier
+                .size(120.dp)
+                .padding(all = 4.dp)
+            )
+            Row(
+                verticalAlignment = Alignment1.Top
+            ) {
+                Text(
+                    text = highlightValue,
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = highlightUnit,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun WeatherParam(
     paramImageSrc: String,
     paramValue: String,
@@ -463,7 +608,7 @@ fun WeatherParam(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment1.CenterVertically
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -481,6 +626,45 @@ fun WeatherParam(
             text = paramValue,
             style = MaterialTheme.typography.titleSmall
         )
+    }
+}
+
+@Composable
+fun ErrorScreen(
+    errorMessage: String,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment1.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Icon(
+            imageVector = Icons.TwoTone.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(48.dp)
+        )
+        Text(
+            text = errorMessage,
+            textAlign = TextAlign.Center
+        )
+
+        Button(
+            onClick = onRetryClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.tertiary,
+                disabledContentColor = MaterialTheme.colorScheme.onTertiary
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.retry).uppercase(Locale.getDefault())
+            )
+        }
     }
 }
 
@@ -518,7 +702,8 @@ fun SmallWeatherCardPreview() {
             time = "Now",
             weatherCode = 1,
             isDay = true,
-            temperature = 10
+            temperature = 10,
+            onClick = {}
         )
     }
 }
@@ -534,6 +719,33 @@ fun MediumWeatherCardPreview() {
             temperatureMin = 1,
             sunriseTime = "4:20 AM",
             sunsetTime = "9:37 PM"
+        )
+    }
+}
+
+@Composable
+@Preview
+fun HighlightCardPreview() {
+    WeatherTheme {
+        HighlightCard(
+            highlightTitle = "Title",
+            paramImageSrc = "",
+            highlightValue = "1000",
+            highlightUnit = "hPa",
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+@Preview
+fun ErrorScreenPreview() {
+    WeatherTheme {
+        ErrorScreen(
+            errorMessage = "Something went wrong!",
+            onRetryClick = {
+
+            }
         )
     }
 }

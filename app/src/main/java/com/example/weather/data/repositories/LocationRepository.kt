@@ -5,6 +5,8 @@ import com.example.weather.location.LocationService
 
 interface LocationRepository {
     suspend fun getCurrentLocation(): Location?
+
+    suspend fun getLastLocation(): Location?
 }
 
 class FusedLocationRepository(
@@ -13,6 +15,10 @@ class FusedLocationRepository(
 
     override suspend fun getCurrentLocation(): Location? {
         return locationService.getCurrentLocation()
+    }
+
+    override suspend fun getLastLocation(): Location? {
+        return locationService.getLastLocation()
     }
 
 }
