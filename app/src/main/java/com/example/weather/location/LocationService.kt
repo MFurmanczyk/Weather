@@ -3,7 +3,6 @@ package com.example.weather.location
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -66,8 +65,6 @@ class FusedLocationService(private val context: Context) : LocationService {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getLastLocation(): Location? {
-
-        Log.d("LOCATION", "getLastLocation: lastLocation")
 
         val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
             context,
