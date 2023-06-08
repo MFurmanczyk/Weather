@@ -5,7 +5,6 @@ import com.example.weather.location.LocationService
 
 interface LocationRepository {
     suspend fun getCurrentLocation(): Location?
-
     suspend fun getLastLocation(): Location?
 }
 

@@ -87,7 +87,6 @@ fun WeatherScreen(
             modifier = modifier.pullRefresh(refreshState)
         ) {
 
-
             val isSuccess = weatherState is WeatherState.Success
 
             AnimatedVisibility(
@@ -179,6 +178,62 @@ fun WeatherScreen(
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Row(
+                                    verticalAlignment = Alignment1.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(R.string.pressure),
+                                            paramImageSrc = WeatherImages.getParamImage(
+                                                WeatherImages.WeatherParams.PRESSURE
+                                            ),
+                                            highlightValue = currentUnit?.pressureSurface?.roundToInt()
+                                                .toString(),
+                                            highlightUnit = "hPa",
+                                            contentDescription = null
+                                        )
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(R.string.humidity),
+                                            paramImageSrc = WeatherImages.getParamImage(
+                                                WeatherImages.WeatherParams.HUMIDITY
+                                            ),
+                                            highlightValue = currentUnit?.humidity?.roundToInt()
+                                                .toString(),
+                                            highlightUnit = "%",
+                                            contentDescription = null
+                                        )
+                                    }
+
+                                    Row(
+                                        verticalAlignment = Alignment1.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(R.string.precipitation),
+                                            paramImageSrc = WeatherImages.getParamImage(
+                                                WeatherImages.WeatherParams.PRECIPITATION
+                                            ),
+                                            highlightValue = currentUnit?.precipitation?.roundToInt()
+                                                .toString(),
+                                            highlightUnit = "mm",
+                                            contentDescription = null
+                                        )
+                                        HighlightCard(
+                                            modifier = Modifier.weight(1F),
+                                            highlightTitle = stringResource(R.string.precipitation_probability),
+                                            paramImageSrc = WeatherImages.getParamImage(
+                                                WeatherImages.WeatherParams.PRECIPITATION_PROBABILITY
+                                            ),
+                                            highlightValue = currentUnit?.precipitationProbability?.roundToInt()
+                                                .toString(),
+                                            highlightUnit = "%",
+                                            contentDescription = null
+                                        )
+                                    }
+
+                                    Row(
                                         verticalAlignment = Alignment1.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                                     ) {
@@ -199,27 +254,7 @@ fun WeatherScreen(
                                             contentDescription = null
                                         )
                                     }
-                                    Row(
-                                        verticalAlignment = Alignment1.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        HighlightCard(
-                                            modifier = Modifier.weight(1F),
-                                            highlightTitle = stringResource(R.string.pressure),
-                                            paramImageSrc = WeatherImages.getParamImage(WeatherImages.WeatherParams.PRESSURE),
-                                            highlightValue = currentUnit?.pressureSurface?.roundToInt().toString(),
-                                            highlightUnit = "hPa",
-                                            contentDescription = null
-                                        )
-                                        HighlightCard(
-                                            modifier = Modifier.weight(1F),
-                                            highlightTitle = stringResource(R.string.humidity),
-                                            paramImageSrc = WeatherImages.getParamImage(WeatherImages.WeatherParams.HUMIDITY),
-                                            highlightValue = currentUnit?.humidity?.roundToInt().toString(),
-                                            highlightUnit = "%",
-                                            contentDescription = null
-                                        )
-                                    }
+
                                 }
                             }
                         }
@@ -568,7 +603,8 @@ fun HighlightCard(
             Text(
                 text = highlightTitle,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center
             )
             AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)

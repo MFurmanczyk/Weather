@@ -34,6 +34,8 @@ object WeatherImages {
         WeatherParams.SUNSET to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/sunset.png",
         WeatherParams.UV to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/uv.png",
         WeatherParams.WIND to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/wind-day.png",
+        WeatherParams.PRECIPITATION to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/10d.png",
+        WeatherParams.PRECIPITATION_PROBABILITY to "https://raw.githubusercontent.com/hicodersofficial/weather-app/main/public/weather_icons/10d.png"
     )
 
     /**
@@ -92,6 +94,8 @@ object WeatherImages {
         SUNRISE,
         SUNSET,
         UV,
-        WIND
+        WIND,
+        PRECIPITATION,
+        PRECIPITATION_PROBABILITY
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 /**
  * Interface provides methods that every location service must implement.
  * [getCurrentLocation] - should return current device location provided by the service
+ * [getLastLocation] - should return last known device location provided by the service
  */
 interface LocationService {
     suspend fun getCurrentLocation(): Location?

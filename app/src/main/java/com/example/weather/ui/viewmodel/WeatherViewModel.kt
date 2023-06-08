@@ -39,13 +39,11 @@ sealed interface WeatherState {
             return e.message.toString()
         }
     }
-
     data class MessageError(private val msg: String) : Error {
         override fun getMessage(): String {
             return msg
         }
     }
-
     object Loading : WeatherState
 }
 
@@ -167,10 +165,11 @@ class WeatherViewModel(
         return geocoderRepository.getFromLocation(location.latitude, location.longitude)
     }
 
-    /**
-     * Factory for [WeatherViewModel] that takes [WeatherRepository] as a dependency
-     */
+
     companion object {
+        /**
+         * Factory for [WeatherViewModel] that takes [WeatherRepository] as a dependency
+        */
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as WeatherApplication)

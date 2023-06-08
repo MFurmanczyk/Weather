@@ -11,4 +11,6 @@
     <string name="pressure">Pressure</string>
     <string name="humidity">Humidity</string>
     <string name="retry">Retry</string>
+    <string name="precipitation">Precipitation</string>
+    <string name="precipitation_probability">Precipitation probability</string>
 </resources>
