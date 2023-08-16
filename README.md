@@ -4,7 +4,7 @@ Weather app for portfolio and educational purposes. Made for Android phones/tabl
 # About the app
 Application shows current weather with highlights, hourly and daily forecast for current location.
 
-[](./images/phone_vertical_screenshot.png) [](./images/phone_vertical_screenshot_2.png)
+![](./images/phone_vertical_screenshot.png) ![](./images/phone_vertical_screenshot_2.png)
 
 # Technology and techniques
 Used technology and programming techniques:
