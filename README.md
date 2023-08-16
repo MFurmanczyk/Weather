@@ -6,7 +6,7 @@ Application shows current weather with highlights, hourly and daily forecast for
 
 <p align="center">
   <img src="./images/phone_vertical_screenshot.png" width="350" title="screenshot_1">
-  <img src="./images/phone_vertical_screenshot_2.png" width="350">
+  <img src="./images/phone_vertical_screenshot_2.png" width="350" title="screenshot_2">
 </p>
 
 # Technology and techniques
